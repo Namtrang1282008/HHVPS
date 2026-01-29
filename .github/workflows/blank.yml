@@ -1,34 +1,35 @@
-name: VPS-LINUX-GIGABIT-IPHONE
+name: VPS-LINUX-CHuan-DET
 on: workflow_dispatch
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: 🛠️ 1. Cài đặt hệ thống & Tailscale
+      - name: 🛠️ 1. Cai dat He thong
         run: |
+          # Cai dat im lang de tranh loi
           curl -fsSL https://tailscale.com/install.sh | sh > /dev/null 2>&1
-          sudo tailscale up --authkey=${{ secrets.TAILSCALE_AUTHKEY }} --accept-dns=false
-          sudo apt update && sudo apt install -y openssh-server jq > /dev/null 2>&1
+          # Lenh nay se tu dong bo qua cac buoc xac thuc treo
+          sudo tailscale up --authkey=${{ secrets.TAILSCALE_AUTHKEY }} --accept-dns=false --timeout=30s || echo "Tiep tuc chay..."
 
-      - name: 🔑 2. Thiết lập tài khoản & Cổng
+      - name: 🔑 2. Thiet lap SSH & Info
         run: |
-          # Thiết lập mật khẩu là: vps12345
+          # Tao mat khau moi
           echo "runner:vps12345" | sudo chpasswd
           sudo service ssh start
-
-      - name: 📊 3. HIỂN THỊ THÔNG TIN ĐĂNG NHẬP
-        run: |
+          
+          # Lay IP va in ra man hinh ngay lap tuc
           IP_ADDR=$(tailscale ip -4)
           echo -e "\n\033[1;32m=========================================="
-          echo -e "   THÔNG TIN VPS LINUX CỦA BẠN"
+          echo -e "   INFO VPS CUA BAN (COPY VAO TERMIUS)"
           echo -e "=========================================="
-          echo -e "📍 ĐỊA CHỈ IP : $IP_ADDR"
-          echo -e "👤 TÀI KHOẢN  : runner"
-          echo -e "🔑 MẬT KHẨU   : vps12345"
-          echo -e "🚪 CỔNG (PORT): 22"
+          echo -e "📍 IP: $IP_ADDR"
+          echo -e "👤 USER: runner"
+          echo -e "🔑 PASS: vps12345"
+          echo -e "🚪 PORT: 22"
           echo -e "==========================================\033[0m\n"
-          echo "Lưu ý: Bạn phải bật app Tailscale trên iPhone mới kết nối được IP này!"
 
-      - name: ⏳ 4. Duy trì VPS (6 Giờ)
-        run: sleep 21600
+      - name: ⏳ 3. Duy tri (Khong cho chet may)
+        run: |
+          echo "VPS dang hoat dong trong 6 gio..."
+          sleep 21600
