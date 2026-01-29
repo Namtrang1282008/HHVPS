@@ -1,0 +1,34 @@
+name: VPS-LINUX-GIGABIT-IPHONE
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛠️ 1. Cài đặt hệ thống & Tailscale
+        run: |
+          curl -fsSL https://tailscale.com/install.sh | sh > /dev/null 2>&1
+          sudo tailscale up --authkey=${{ secrets.TAILSCALE_AUTHKEY }} --accept-dns=false
+          sudo apt update && sudo apt install -y openssh-server jq > /dev/null 2>&1
+
+      - name: 🔑 2. Thiết lập tài khoản & Cổng
+        run: |
+          # Thiết lập mật khẩu là: vps12345
+          echo "runner:vps12345" | sudo chpasswd
+          sudo service ssh start
+
+      - name: 📊 3. HIỂN THỊ THÔNG TIN ĐĂNG NHẬP
+        run: |
+          IP_ADDR=$(tailscale ip -4)
+          echo -e "\n\033[1;32m=========================================="
+          echo -e "   THÔNG TIN VPS LINUX CỦA BẠN"
+          echo -e "=========================================="
+          echo -e "📍 ĐỊA CHỈ IP : $IP_ADDR"
+          echo -e "👤 TÀI KHOẢN  : runner"
+          echo -e "🔑 MẬT KHẨU   : vps12345"
+          echo -e "🚪 CỔNG (PORT): 22"
+          echo -e "==========================================\033[0m\n"
+          echo "Lưu ý: Bạn phải bật app Tailscale trên iPhone mới kết nối được IP này!"
+
+      - name: ⏳ 4. Duy trì VPS (6 Giờ)
+        run: sleep 21600
